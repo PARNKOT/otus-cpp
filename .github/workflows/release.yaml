@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest-4cores-16gb-20.04
+    runs-on: ubuntu-20.04
     permissions: write-all
     steps:
       - uses: actions/checkout@v2
