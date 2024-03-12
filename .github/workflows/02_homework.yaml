@@ -25,7 +25,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: 02_homework_${{ github.run_number }}
-          release_name: Release ${{ github.run_number }}
+          release_name: Release 02_homework ${{ github.run_number }}
           draft: false
           prerelease: false
       - name: Upload Release Asset
