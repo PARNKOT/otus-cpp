@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(allocator)
+project(03_homework)
 
 if(DEFINED ENV{GITHUB_RUN_NUMBER})
     project(${PROJECT_NAME} VERSION 0.0.$ENV{GITHUB_RUN_NUMBER})
