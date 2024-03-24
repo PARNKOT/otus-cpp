@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(helloworld)
+project(allocator)
 
 if(DEFINED ENV{GITHUB_RUN_NUMBER})
     project(${PROJECT_NAME} VERSION 0.0.$ENV{GITHUB_RUN_NUMBER})
@@ -8,7 +8,7 @@ else()
 endif()
 
 
-option(WITH_BOOST_TEST "Whether to build Boost test" ON)
+option(WITH_BOOST_TEST "Whether to build Boost test" OFF)
 
 
 configure_file(version.hpp.in version.hpp)
