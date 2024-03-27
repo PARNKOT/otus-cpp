@@ -2,7 +2,7 @@
 #include <map>
 #include "version.hpp"
 #include "MyAllocator.hpp"
-
+#include "MyContainer.hpp"
 
 long factorial(long n) {
     if (n == 0 || n == 1) {
@@ -37,5 +37,11 @@ int main(int argc, char* argv[])  {
     std::cout << "Map container with MyAllocator:" << std::endl;
     print_map(m2);
 
+    MyContainer<int> c;
+
+    c.add(1);
+    c.add(2);
+    c.add(3);
+    
     return 0;
 }
