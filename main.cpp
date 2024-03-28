@@ -32,7 +32,7 @@ int main(int argc, char* argv[])  {
 
     fill_map(m1);
 
-    std::map<int, int, std::less<int>, MyAllocator<std::pair<int, int>>> m2;
+    std::map<int, int, std::less<int>, MyAllocator<std::pair<int, int>, 10>> m2;
 
     fill_map(m2);
     std::cout << "Map container with MyAllocator:" << std::endl;

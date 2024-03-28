@@ -3,16 +3,33 @@
 
 #define DEFAULT_POOL_SIZE 10
 
-template <typename T>
+template <typename T, size_t _N = DEFAULT_POOL_SIZE>
 struct MyAllocator {
     using value_type = T;
 
     MyAllocator () noexcept {}
     //_pool (::operator new(_N * sizeof(T))) {}
-    template <class U> MyAllocator (const MyAllocator<U>&) noexcept {}
+    template <class U> MyAllocator (const MyAllocator<U, _N>&) noexcept {}
+
+    template<class U>
+    struct rebind {
+        using other = MyAllocator<U, _N>;
+    };
+
+    template <class U>
+    constexpr bool operator== (const MyAllocator<U, _N>& a1) noexcept
+    {
+        return true;
+    }
+
+    template <class U>
+    constexpr bool operator!= (const MyAllocator<U, _N>& a1) noexcept
+    {
+        return false;
+    }
 
     T* allocate(size_t n) {
-        if (n > (_pool_size - _alloc_n))  {
+        if (n > (_N - _alloc_n))  {
             throw std::bad_alloc();
         }
 
@@ -59,23 +76,23 @@ private:
             //  TODO: delete
         }
 
-        _pool = new T[_pool_size * sizeof(T)];
+        _pool = new T[_N * sizeof(T)];
     }
 
-    static constexpr long _pool_size = DEFAULT_POOL_SIZE;
+    //static constexpr long _pool_size = _N; //DEFAULT_POOL_SIZE;
 
     T* _pool = nullptr;
     size_t _alloc_n = 0;
 };
 
-template <class T, class U>
-constexpr bool operator== (const MyAllocator<T>& a1, const MyAllocator<U>& a2) noexcept
-{
-    return true;
-}
+// template <class T, class U>
+// constexpr bool operator== (const MyAllocator<T>& a1, const MyAllocator<U>& a2) noexcept
+// {
+//     return true;
+// }
 
-template <class T, class U>
-constexpr bool operator!= (const MyAllocator<T>& a1, const MyAllocator<U>& a2) noexcept
-{
-    return false;
-}
+// template <class T, class U>
+// constexpr bool operator!= (const MyAllocator<T>& a1, const MyAllocator<U>& a2) noexcept
+// {
+//     return false;
+// }
