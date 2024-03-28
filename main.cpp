@@ -3,7 +3,10 @@
 #include "version.hpp"
 #include "MyAllocator.hpp"
 #include "MyContainer.hpp"
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8332f9053fa63f453c73556d11a262526d7680ea
 
 long factorial(long n) {
     if (n == 0 || n == 1) {
