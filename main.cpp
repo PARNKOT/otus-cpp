@@ -1,6 +1,6 @@
 #include <iostream>
 #include <map>
-#include "version.hpp"
+//#include "version.hpp"
 #include "MyAllocator.hpp"
 #include "MyContainer.hpp"
 
@@ -42,7 +42,13 @@ int main(int argc, char* argv[])  {
 
     c.add(1);
     c.add(2);
-    c.add(3);
+    //c.add(3);
+
+    std::cout << c[0] << std::endl;
+
+    for (int el : c) {
+        std::cout << el << std::endl;
+    }
 
     return 0;
 }

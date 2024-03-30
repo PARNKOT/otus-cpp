@@ -10,7 +10,7 @@ public:
         allocate_mem(DEFAULT_CONTAINER_SIZE);
     }
 
-    void add(T el) {
+    void add(const T& el) {
         if (_size  == _capacity) {
             // reallocate memory
             reallocate_mem();
@@ -18,6 +18,18 @@ public:
 
         _mem[_size] = el; 
         _size += 1;
+    }
+
+    T& operator [](std::size_t pos) {
+        return _mem[pos];
+    }
+
+    T* begin() {
+        return _mem;
+    }
+
+    T* end() {
+        return _mem + _size;
     }
 
 private:
