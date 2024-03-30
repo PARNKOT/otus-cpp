@@ -13,6 +13,13 @@
 // ("11.", '.') -> ["11", ""]
 // (".11", '.') -> ["", "11"]
 // ("11.22", '.') -> ["11", "22"]
+
+#define IPv4 4
+#define IPv IPv4
+
+using ip_t = std::array<uint8_t, IPv>;
+
+
 std::vector<std::string> split(const std::string &str, char d)
 {
     std::vector<std::string> r;
@@ -32,17 +39,28 @@ std::vector<std::string> split(const std::string &str, char d)
     return r;
 }
 
-void print_ip(const std::vector<std::string>& ip) {
-    for(auto ip_part = ip.cbegin(); ip_part != ip.cend(); ++ip_part)
-    {
-        if (ip_part != ip.cbegin())
-        {
-            std::cout << ".";
 
-        }
-        std::cout << *ip_part;
+ip_t ip_string_to_array(const std::string& ip_str) {
+    ip_t ip;
+
+    std::size_t old_pos = 0;
+    std::size_t current_pos = ip_str.find_first_of('.');
+
+    for (short i = 0; i < ip.size(); ++i)  {
+        ip[i] =  std::stoi(ip_str.substr(old_pos, current_pos), nullptr, 10);
+        old_pos = current_pos  + 1;
+        current_pos = ip_str.find_first_of('.', old_pos);
     }
-    std::cout << std::endl;
+
+    return ip;
+}
+
+
+void print_ip(const ip_t& ip) {
+    for (const auto& part : ip) {
+        std::cout << std::to_string(part) << ".";
+    }
+    std::cout << "\b " << std::endl;
 }
 
 template <typename T, typename filter, typename print>
@@ -60,24 +78,21 @@ int main(int argc, char const *argv[])
 
     try
     {
-        std::vector<std::vector<std::string> > ip_pool;
+        std::vector<ip_t > ip_pool;
 
         for(std::string line; std::getline(std::cin, line);)
         {
             std::vector<std::string> v = split(line, '\t');
-            ip_pool.push_back(split(v.at(0), '.'));
+            ip_pool.push_back(ip_string_to_array(v.at(0)));
         }
 
         // TODO reverse lexicographically sort
 
         std::sort(ip_pool.begin(), ip_pool.end(), [](auto ip1, auto ip2){
             for (int i = 0; i < ip1.size(); ++i){
-                int part1 = std::stoi(ip1[i], nullptr, 10);
-                int part2 = std::stoi(ip2[i], nullptr, 10);
-
-                if (part1 < part2) {
+                if (ip1[i] < ip2[i]) {
                     return false;
-                } else if (part1 > part2) {
+                } else if (ip1[i] > ip2[i]) {
                     return true;
                 }
             }
@@ -87,29 +102,25 @@ int main(int argc, char const *argv[])
 
         std::cout << "Sorted ip:" << std::endl;
 
-        for(std::vector<std::vector<std::string> >::const_iterator ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
+        for(std::vector<ip_t>::const_iterator ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
         {
             print_ip(*ip);
         }
 
         filter_and_print(ip_pool,
         [](auto ip){
-            int part1 = std::stoi(ip[0], nullptr, 10);
-            return part1 == 1 ? true : false;
+            return ip[0] == 1 ? true : false;
         }, print_ip);
 
         filter_and_print(ip_pool,
         [](auto ip){
-            int part1 = std::stoi(ip[0], nullptr, 10);
-            int part2 = std::stoi(ip[1], nullptr, 10);
-            return (part1 == 46 && part2 == 70) ? true : false;
+            return (ip[0] == 46 && ip[1] == 70) ? true : false;
         }, print_ip);
 
         filter_and_print(ip_pool,
         [](auto ip){
             for (const auto& part : ip) {
-                int n = std::stoi(part);
-                if (n == 46) {
+                if (part == 46) {
                     return true;
                 }
             }
