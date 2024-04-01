@@ -4,6 +4,7 @@
 #include "MyAllocator.hpp"
 #include "MyContainer.hpp"
 
+#define DEFAULT_SIZE 10
 
 long factorial(long n) {
     if (n == 0 || n == 1) {
@@ -15,7 +16,7 @@ long factorial(long n) {
 
 template<typename T>
 void fill_map(T&  map){
-    for (int i = 0; i < DEFAULT_POOL_SIZE; ++i) {
+    for (int i = 0; i < DEFAULT_SIZE; ++i) {
         map[i] = factorial(i);
     }
 }
@@ -27,28 +28,39 @@ void print_map(T&  map){
     }
 }
 
+template<typename T>
+void print_container(T&  container){
+    for (const auto& v :  container) {
+        std::cout << v << ", ";
+    }
+    std::cout << "\b\b " << std::endl;
+}
+
 int main(int argc, char* argv[])  {
     std::map<int, int> m1;
 
     fill_map(m1);
 
-    std::map<int, int, std::less<int>, MyAllocator<std::pair<int, int>, 10>> m2;
+    std::map<int, int, std::less<int>, MyAllocator<std::pair<int, int>, DEFAULT_SIZE>> m2;
 
     fill_map(m2);
     std::cout << "Map container with MyAllocator:" << std::endl;
     print_map(m2);
 
-    MyContainer<int> c;
+    MyContainer<int> c1;
 
-    c.add(1);
-    c.add(2);
-    //c.add(3);
-
-    std::cout << c[0] << std::endl;
-
-    for (int el : c) {
-        std::cout << el << std::endl;
+    for (int i = 0; i < DEFAULT_SIZE; ++i) {
+        c1.add(i);
     }
+
+    MyContainer<int, MyAllocator<int, DEFAULT_SIZE>> c2(DEFAULT_SIZE);
+
+    for (int i = 0; i < DEFAULT_SIZE; ++i) {
+        c2.add(i);
+    }
+
+    std::cout << "MyContainer with MyAllocator: " << std::endl;
+    print_container(c2);
 
     return 0;
 }

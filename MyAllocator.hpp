@@ -8,7 +8,6 @@ struct MyAllocator {
     using value_type = T;
 
     MyAllocator () noexcept {}
-    //_pool (::operator new(_N * sizeof(T))) {}
     template <class U> MyAllocator (const MyAllocator<U, _N>&) noexcept {}
 
     template<class U>
@@ -41,27 +40,31 @@ struct MyAllocator {
         
         allocated_mem = _pool + _alloc_n;
         _alloc_n += n;
-        
-        std::cout << "[MyAllocator] Allocated: " << _alloc_n << ", bytes: " << n * sizeof(T) << std::endl;
 
+#ifdef DEBUG   
+        std::cout << "[MyAllocator] Allocated: " << _alloc_n << ", bytes: " << n * sizeof(T) << std::endl;
+#endif
         return allocated_mem;
     }
 
     void deallocate(T* mem, size_t n) {
         if (n > _alloc_n) {
             _alloc_n = 0;
+            return;
         }
 
         _alloc_n -= n;
 
+#ifdef DEBUG
         std::cout << "[MyAllocator] Deallocate memory size = " << n * sizeof(T) << ", allocated: " << _alloc_n <<  std::endl;
-        // std::cout << "[MyAllocator] Allocated: " << _alloc_n << std::endl;
-        //delete[] mem;
+#endif
     }
 
     ~MyAllocator() {
         if (_pool != nullptr) {
+#ifdef DEBUG
             std::cout << "[MyAllocator] Deleting pool" << std::endl;
+#endif
             delete[] _pool;
         }
     }
@@ -79,20 +82,6 @@ private:
         _pool = new T[_N * sizeof(T)];
     }
 
-    //static constexpr long _pool_size = _N; //DEFAULT_POOL_SIZE;
-
     T* _pool = nullptr;
     size_t _alloc_n = 0;
 };
-
-// template <class T, class U>
-// constexpr bool operator== (const MyAllocator<T>& a1, const MyAllocator<U>& a2) noexcept
-// {
-//     return true;
-// }
-
-// template <class T, class U>
-// constexpr bool operator!= (const MyAllocator<T>& a1, const MyAllocator<U>& a2) noexcept
-// {
-//     return false;
-// }

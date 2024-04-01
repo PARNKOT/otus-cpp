@@ -58,6 +58,12 @@
         "ratio": "cpp",
         "numbers": "cpp",
         "ranges": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "bitset": "cpp",
+        "condition_variable": "cpp",
+        "iomanip": "cpp",
+        "mutex": "cpp",
+        "typeindex": "cpp",
+        "variant": "cpp"
     }
 }

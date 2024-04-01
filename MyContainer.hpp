@@ -6,13 +6,12 @@
 template <typename T, typename Allocator = std::allocator<T>>
 class MyContainer {
 public:
-    MyContainer() : _capacity{DEFAULT_CONTAINER_SIZE} {
-        allocate_mem(DEFAULT_CONTAINER_SIZE);
+    MyContainer(std::size_t n = DEFAULT_CONTAINER_SIZE) : _capacity{n} {
+        allocate_mem(_capacity);
     }
 
     void add(const T& el) {
         if (_size  == _capacity) {
-            // reallocate memory
             reallocate_mem();
         }
 
@@ -34,7 +33,7 @@ public:
 
 private:
     void allocate_mem(size_t n) {
-        _mem = std::allocator_traits<Allocator>::allocate(_alloc, DEFAULT_CONTAINER_SIZE);
+        _mem = std::allocator_traits<Allocator>::allocate(_alloc, n);
     }
 
     void reallocate_mem() {
@@ -44,9 +43,11 @@ private:
 
         T* tmp_mem = std::allocator_traits<Allocator>::allocate(_alloc, _capacity * 2);
 
-        std::memcpy(tmp_mem, _mem, _size);
+        std::memcpy(tmp_mem, _mem, _size * sizeof(T));
 
         std::allocator_traits<Allocator>::deallocate(_alloc, _mem, _capacity);
+
+        _mem = tmp_mem;
 
         _capacity *= 2;
     }
