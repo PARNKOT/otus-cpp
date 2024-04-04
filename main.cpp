@@ -13,8 +13,9 @@
 template<typename T, size_t N = sizeof(T), typename std::enable_if_t<std::is_integral_v<T>>* = nullptr>
 void print_ip(T number) {
     for (int i = N - 1; i >= 0; --i) {
-        uint8_t byte = (number >> i * 8);
-        std::cout << std::to_string(byte) << ".";
+        // uint8_t byte = (number >> i * 8);
+        int byte = (number >> i * 8) & 0xFF;
+        std::cout << byte << ".";
     }
     std::cout << "\b " << std::endl;
 }
