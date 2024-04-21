@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(ip_filter)
+project(matrix)
 
 if(DEFINED ENV{GITHUB_RUN_NUMBER})
     project(${PROJECT_NAME} VERSION 0.0.$ENV{GITHUB_RUN_NUMBER})
@@ -14,7 +14,7 @@ option(WITH_BOOST_TEST "Whether to build Boost test" OFF)
 configure_file(version.hpp.in version.hpp)
 include_directories(${CMAKE_BINARY_DIR})
 
-add_executable(${PROJECT_NAME} ip_filter.cpp)
+add_executable(${PROJECT_NAME} main.cpp)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD 17
