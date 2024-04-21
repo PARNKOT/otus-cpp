@@ -8,6 +8,7 @@ namespace matrix {
 
     template<typename  T, T Default>
     struct SparseArray {
+        // TODO: fix size method. Do via loop and check if Default
         constexpr std::size_t size() const noexcept {
             return array_.size();
         }
@@ -25,11 +26,20 @@ namespace matrix {
     };
 
     template<typename  T, T Default>
-    struct Matrix {
-        constexpr std::size_t size() const noexcept;
+    struct SparseMatrix {
+        constexpr std::size_t size() const noexcept {
+            std::size_t value = 0;
+            for (const auto& p : matrix_)
+                value += p.second.size();
 
-        T& operator[](index_t index) {
-            
+            return value;
+        }
+
+        SparseArray<T, Default>& operator[](index_t index) {
+            if (matrix_.count(index) == 0) {
+                matrix_[index] = SparseArray<T, Default>();
+            }
+            return matrix_[index];
         }
 
     private:
