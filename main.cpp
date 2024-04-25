@@ -1,6 +1,8 @@
 #include <iostream>
 #include "Matrix.hpp"
+#include "matrix_v2.hpp"
 
+namespace matrix = matrix_v2;
 
 int main(int argc, char const *argv[])
 {
