@@ -2,7 +2,7 @@
 #include <iostream>
 #include <map>
 
-namespace matrix {
+namespace matrix_v1 {
     using index_t = std::size_t;
 
 
