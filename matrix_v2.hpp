@@ -25,6 +25,13 @@ namespace matrix_v2 {
                 return map_->at(index_);
             };
 
+            T& operator [](index_t index) {
+                if (map_->count(index_) == 0) {
+                    return Default;
+                }
+                return map_->at(index_);
+            }
+
             private:
                 //T* value_ = Default;
                 map_t* map_;
@@ -47,24 +54,41 @@ namespace matrix_v2 {
 
     template<typename  T, T Default>
     struct SparseMatrix {
-        constexpr std::size_t size() const noexcept {
-            std::size_t value = 0;
-            for (const auto& p : matrix_)
-                value += p.second.size();
+        struct Value {
+            explicit Value(map_t* p_map, index_t index) : map_{p_map}, index_{index} {}
 
-            return value;
-        }
-
-        SparseArray<T, Default>& operator[](index_t index) {
-            if (matrix_.count(index) == 0) {
-                matrix_[index] = SparseArray<T, Default>();
+            Value& operator =(const T& value) {
+                (*map_)[index_] = value;
+                return *this;
             }
-            return matrix_[index];
-        }
+
+            operator T() {
+                if (map_->count(index_) == 0) {
+                    return Default;
+                }
+                return map_->at(index_);
+            };
+
+            T& operator [](index_t index) {
+                if (map_->count(index_) == 0) {
+                    return Default;
+                }
+                return map_->at(index_);
+            }
+
+            private:
+                void create() {
+                    (*map_)[index_] = value;
+                }
+
+                map_t* map_ = nullptr;
+                index_t index_ = -1;
+                Value* prev = nullptr;
+                Value* next = nullptr;
+        };
 
     private:
-        //SparseArray<SparseArray<T, Default>, Default> matrix_;
-        std::map<index_t, SparseArray<T, Default>> matrix_;
+        std::map<index_t, std::map<index_t, T>> matrix_;
     };
 
 }
