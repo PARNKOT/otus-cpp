@@ -24,8 +24,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: 06_homework_${{ github.run_number }}
-          release_name: Release 06_homework ${{ github.run_number }}
+          tag_name: 06_homework_matrix_${{ github.run_number }}
+          release_name: Release 06_homework_matrix ${{ github.run_number }}
           draft: false
           prerelease: false
       - name: Upload Release Asset
