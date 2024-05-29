@@ -1,10 +1,17 @@
 #include <iostream>
+#include <fstream>
 #include "bulk.hpp"
 
 using namespace bulk;
 
 #define CMD_START_BLOCK "{"
 #define CMD_END_BLOCK "}"
+
+/*
+##########
+#  Bulk  #
+##########
+*/
 
 // Public
 
@@ -39,9 +46,9 @@ void Bulk::execute() {
             continue;
         }
 
-        cmd_queue_.push(cmd);
+        cmds_.push_back(cmd);
 
-        if (cmd_queue_.size() == block_size_ && block_counter == 0) {
+        if (cmds_.size() == block_size_ && block_counter == 0) {
             execute_commands();
         }
     }
@@ -51,19 +58,38 @@ void Bulk::execute() {
     }
 }
 
+void Bulk::add_printer(printer_ptr printer)  {
+    observers_.push_back(printer);
+}
+
+void Bulk::notify() {
+    for (const auto& observer : observers_)   {
+        observer->print(cmds_);
+    }
+}
 
 // Private
 
 void Bulk::execute_commands() {
-    if (cmd_queue_.size() == 0) {
-        return;
-    }
+    notify();
+    cmds_.clear();
+}
 
-    std::cout << "bulk: ";
-    while (cmd_queue_.size() > 0) {
-        std::cout << cmd_queue_.front() << ", ";
-        cmd_queue_.pop();
-    }
 
-    std::cout << "\b\b " << std::endl;
+/*
+##############
+#  Printers  #
+##############
+*/
+
+void ConsolePrinter::print(const commands& cmds) {
+    print_(std::cout, cmds);
+}
+
+void FilePrinter::print(const commands& cmds) {
+    std::ofstream file(path_, std::ios::app);
+
+    if (file.is_open()) {
+        print_(file, cmds);
+    }
 }
