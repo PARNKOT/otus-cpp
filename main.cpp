@@ -7,7 +7,7 @@
 #include <boost/program_options.hpp>
 
 #include "version.hpp"
-
+#include "FileReader.hpp"
 
 #define SCAN_LEVEL_DEFAULT 0
 #define FILE_MIN_SIZE_DEFAULT 1 // bytes
@@ -53,13 +53,6 @@ int main(int argc, char const *argv[])
     po::store(po::command_line_parser(argc, argv).options(desc).positional(pos_desc).run(), vm);
     po::notify(vm);
 
-    // if(vm.count("input-directory") == 0) {
-    //     std::cerr << "Input directories are not provided"  << std::endl;
-    //     return -1;
-    // }
-
-    //scan_directories = vm["input-directory"].as<std::vector<std::string>>();
-
     if (vm.count("help")) {
         std::cout << desc << std::endl;
         return 0;
@@ -84,6 +77,14 @@ int main(int argc, char const *argv[])
     std::cout << "\tscan directories:" << std::endl;
     for (const auto& dir : scan_directories)
         std::cout << "\t\t- " << dir << std::endl;
+
+    auto file_reader = std::make_shared<FileReadBlockStrategy>("./test.txt", block_size);
+
+    std::string block;
+    int read_bytes;
+    while((read_bytes = file_reader->read(block)) != 0) {
+        printf("Read: %s", block.c_str());
+    }
 
 
     return 0;
