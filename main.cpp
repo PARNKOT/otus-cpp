@@ -8,6 +8,7 @@
 
 #include "version.hpp"
 #include "FileReader.hpp"
+#include "Hashing.hpp"
 
 #define SCAN_LEVEL_DEFAULT 0
 #define FILE_MIN_SIZE_DEFAULT 1 // bytes
@@ -83,7 +84,9 @@ int main(int argc, char const *argv[])
     std::string block;
     int read_bytes;
     while((read_bytes = file_reader->read(block)) != 0) {
-        printf("Read: %s", block.c_str());
+        printf("Read: %s, ", block.c_str());
+        printf("Block size: %li, ", block.size());
+        printf("Block hash: %s \n", hashing::calculate(block, hashing::HashType::MD5).c_str());
     }
 
 
