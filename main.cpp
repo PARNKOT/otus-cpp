@@ -5,10 +5,13 @@
 #include <fstream>
 
 #include <boost/program_options.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "version.hpp"
 #include "FileReader.hpp"
 #include "Hashing.hpp"
+#include "FilesComparor.hpp"
+#include "constants.hpp"
 
 #define SCAN_LEVEL_DEFAULT 0
 #define FILE_MIN_SIZE_DEFAULT 1 // bytes
@@ -37,10 +40,10 @@ int main(int argc, char const *argv[])
         ("help", "TODO")
         ("input-dir,d", po::value<std::vector<std::string>>(&scan_directories), "Directory to scan")
         ("exclude,e", po::value<std::vector<std::string>>(&exclude_directories), "Directory to exclude from scanning")
-        ("scan-level,l", po::value<uint>(&scan_level)->default_value(SCAN_LEVEL_DEFAULT), "Level of scanning (0 - not recursive | 1 - recursive)")
-        ("min-size,s", po::value<uint>(&file_min_size)->default_value(FILE_MIN_SIZE_DEFAULT), "Minimum  file size in bytes")
+        ("scan-level,l", po::value<uint>(&scan_level)->default_value(scan_level_default), "Level of scanning (0 - not recursive | 1 - recursive)")
+        ("min-size,s", po::value<uint>(&file_min_size)->default_value(file_min_size_default), "Minimum  file size in bytes")
         ("mask", po::value<std::string>(&mask), "File mask")
-        ("block-size,S", po::value<uint>(&block_size)->default_value(BLOCK_SIZE_DEFAULT), "Size of block to read from file")
+        ("block-size,S", po::value<uint>(&block_size)->default_value(block_size_default), "Size of block to read from file")
         ("hash,H", po::value<std::string>(&hash)->default_value("md5"), "Hashing algorithm, [crc16 | md5]")
     ;
 
@@ -79,15 +82,47 @@ int main(int argc, char const *argv[])
     for (const auto& dir : scan_directories)
         std::cout << "\t\t- " << dir << std::endl;
 
-    auto file_reader = std::make_shared<FileReadBlockStrategy>("./test.txt", block_size);
+    auto file_reader = std::make_shared<FileReadBlockStrategy>(block_size);
 
-    std::string block;
-    int read_bytes;
-    while((read_bytes = file_reader->read(block)) != 0) {
-        printf("Read: %s, ", block.c_str());
-        printf("Block size: %li, ", block.size());
-        printf("Block hash: %s \n", hashing::calculate(block, hashing::HashType::MD5).c_str());
+    FilesComparor comparor{scan_directories, file_reader};
+
+    if (exclude_directories.size() > 0) {
+        comparor.add_exclude_directories(exclude_directories);
     }
+
+    if (mask.size() > 0) {
+        comparor.set_file_mask(mask);
+    }
+
+    if (boost::iequals(hash, "md5")) {
+        comparor.set_hash_type(hashing::HashType::MD5);
+    } else if (boost::iequals(hash, "crc32")) {
+        comparor.set_hash_type(hashing::HashType::CRC32);
+    }
+
+    comparor.set_scan_level(scan_level);
+
+    auto groups = comparor.run();
+
+    int counter = 1;
+    for (const auto& group : groups) {
+        std::cout << "Group #" << counter << std::endl;
+
+        for (const auto& file : group) {
+            std::cout << file << std::endl;
+        }
+        std::cout << std::endl;
+
+        ++counter;
+    }
+
+    // std::string block;
+    // int read_bytes;
+    // while((read_bytes = file_reader->read(block)) != 0) {
+    //     printf("Read: %s, ", block.c_str());
+    //     printf("Block size: %li, ", block.size());
+    //     printf("Block hash: %s \n", hashing::calculate(block, hashing::HashType::MD5).c_str());
+    // }
 
 
     return 0;

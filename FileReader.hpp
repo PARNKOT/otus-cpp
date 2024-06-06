@@ -6,9 +6,7 @@ namespace fs = std::filesystem;
 
 
 struct FileReadStrategy {
-    FileReadStrategy(const std::string& filename) {
-        set_filename(filename);
-    }
+    //FileReadStrategy() {}
 
     ~FileReadStrategy() {
         if (file_.is_open()){
@@ -26,28 +24,28 @@ struct FileReadStrategy {
         file_.open(filename);
     }
 
-    std::ifstream& get_file() {
+    const std::ifstream& get_file() const {
         return file_;
     }
 
-    private:
-        std::ifstream file_;
+protected:
+    std::ifstream file_;
 };
 
 
 struct FileReadBlockStrategy : public  FileReadStrategy {
-    FileReadBlockStrategy(const fs::path& filename, uint block_size) : FileReadStrategy(filename), block_size_{block_size} {}
+    FileReadBlockStrategy(uint block_size) : block_size_{block_size} {}
 
     uint read(std::string& block) override {
-        if (!get_file().is_open() ||  block_size_ == 0) {
+        if (!file_.is_open() ||  block_size_ == 0) {
             return 0;
         }
 
         char* buf = new char[block_size_];
 
-        get_file().read(buf, block_size_);
+        file_.read(buf, block_size_);
 
-        int read_bytes = get_file().gcount();
+        int read_bytes = file_.gcount();
 
         if (read_bytes != 0) {
             block.clear();
@@ -62,3 +60,5 @@ struct FileReadBlockStrategy : public  FileReadStrategy {
     private:
         uint block_size_ = 0;
 };
+
+
