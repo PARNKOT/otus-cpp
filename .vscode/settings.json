@@ -66,6 +66,6 @@
         "filesystem": "cpp"
     },
     "cmake.debugConfig": {
-        "args": ["< ../ip_filter.tsv"]
+        "args": ["../tests"]
     }
 }

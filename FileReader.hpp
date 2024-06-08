@@ -4,11 +4,14 @@
 
 namespace fs = std::filesystem;
 
+enum class ReadStrategy {
+    BlockRead,
+};
 
-struct FileReadStrategy {
+struct FileReader {
     //FileReadStrategy() {}
 
-    ~FileReadStrategy() {
+    ~FileReader() {
         if (file_.is_open()){
             file_.close();
         }
@@ -33,8 +36,8 @@ protected:
 };
 
 
-struct FileReadBlockStrategy : public  FileReadStrategy {
-    FileReadBlockStrategy(uint block_size) : block_size_{block_size} {}
+struct FileReaderBlock : public  FileReader {
+    FileReaderBlock(uint block_size) : block_size_{block_size} {}
 
     uint read(std::string& block) override {
         if (!file_.is_open() ||  block_size_ == 0) {
@@ -60,5 +63,3 @@ struct FileReadBlockStrategy : public  FileReadStrategy {
     private:
         uint block_size_ = 0;
 };
-
-

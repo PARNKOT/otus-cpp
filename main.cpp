@@ -82,7 +82,7 @@ int main(int argc, char const *argv[])
     for (const auto& dir : scan_directories)
         std::cout << "\t\t- " << dir << std::endl;
 
-    auto file_reader = std::make_shared<FileReadBlockStrategy>(block_size);
+    auto file_reader = std::make_shared<FileReaderBlock>(block_size);
 
     FilesComparor comparor{scan_directories, file_reader};
 
