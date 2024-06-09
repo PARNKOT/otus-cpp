@@ -101,25 +101,33 @@ struct FilesComparor {
             }
         });
 
-        // std::for_each(files.cbegin(), files.cend(), [](const auto& file) {
-        //     std::cout << file << std::endl;
-        // });
-
-        files[0] == files[1];
-
         std::map<fs::path, int> path_to_group_map;
 
+        int group_counter = 0;
         for (int i = 0; i < files.size(); ++i) {
-            for (int k = 0; k < files.size(); ++k) {
+            auto& first = files[i];
+            for (int k = i + 1; k < files.size(); ++k) {
+                auto& second = files[k];
+                if (first != second) {
+                    continue;
+                }
 
+                if (path_to_group_map.count(first.path()) == 0) {
+                    path_to_group_map[first.path()] = group_counter;
+                    ++group_counter;
+                }
+
+                path_to_group_map[second.path()] = path_to_group_map[first.path()];
             }
         }
 
-        return {
-            {"a1", "a2", "a3"},
-            {"b1", "b2", "b3"},
-            {"c1", "c2", "c3"}
-        };
+        compare_result_t out(group_counter);
+
+        std::for_each(path_to_group_map.cbegin(), path_to_group_map.cend(), [&](const auto& pair) {
+            out[pair.second].push_back(fs::absolute(pair.first));
+        });
+
+        return out;
     }
 
 private:

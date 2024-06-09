@@ -11,8 +11,12 @@ struct HashedFile {
         file_reader_->set_filename(file);
     }
 
+    const fs::path& path() const {
+        return file_;
+    }
+
     bool operator==(HashedFile& other) {
-        if ((is_hash_calculated_ == other.is_hash_calculated_ == true) && (hash_.size() != other.hash_.size())) {
+        if (is_hash_calculated_ == true && other.is_hash_calculated_ == true && hash_.size() != other.hash_.size()) {
             return false;
         }
 
@@ -39,6 +43,10 @@ struct HashedFile {
         return (is_hash_calculated_ && other.is_hash_calculated_) ? true : false;
     }
 
+    bool operator!=(HashedFile& other) {
+        return !(*this == other);
+    }
+
 private:
     void calculate_hash_once() {
         if (is_hash_calculated_) {
@@ -48,7 +56,9 @@ private:
         std::string block;
         if (file_reader_->read(block) != 0) {
             hash_ += hashing::calculate(block, hash_type_);
-        } else {
+        }
+
+        if (file_reader_->get_file().eof()) {
             is_hash_calculated_ = true;
         }
     }

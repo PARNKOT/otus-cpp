@@ -13,7 +13,7 @@
 #include "FilesComparor.hpp"
 #include "constants.hpp"
 
-#define SCAN_LEVEL_DEFAULT 0
+#define SCAN_LEVEL_DEFAULT 1
 #define FILE_MIN_SIZE_DEFAULT 1 // bytes
 #define BLOCK_SIZE_DEFAULT 5
 
@@ -44,7 +44,7 @@ int main(int argc, char const *argv[])
         ("min-size,s", po::value<uint>(&file_min_size)->default_value(file_min_size_default), "Minimum  file size in bytes")
         ("mask", po::value<std::string>(&mask), "File mask")
         ("block-size,S", po::value<uint>(&block_size)->default_value(block_size_default), "Size of block to read from file")
-        ("hash,H", po::value<std::string>(&hash)->default_value("md5"), "Hashing algorithm, [crc16 | md5]")
+        ("hash,H", po::value<std::string>(&hash)->default_value(hash_type_default), "Hashing algorithm, [crc16 | md5]")
     ;
 
     po::variables_map vm;
@@ -98,8 +98,7 @@ int main(int argc, char const *argv[])
         comparor.set_hash_type(hashing::HashType::MD5);
     } else if (boost::iequals(hash, "crc32")) {
         comparor.set_hash_type(hashing::HashType::CRC32);
-    }
-
+    
     comparor.set_scan_level(scan_level);
 
     auto groups = comparor.run();
@@ -115,15 +114,6 @@ int main(int argc, char const *argv[])
 
         ++counter;
     }
-
-    // std::string block;
-    // int read_bytes;
-    // while((read_bytes = file_reader->read(block)) != 0) {
-    //     printf("Read: %s, ", block.c_str());
-    //     printf("Block size: %li, ", block.size());
-    //     printf("Block hash: %s \n", hashing::calculate(block, hashing::HashType::MD5).c_str());
-    // }
-
 
     return 0;
 }

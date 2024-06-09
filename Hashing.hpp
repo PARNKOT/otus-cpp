@@ -5,6 +5,7 @@
 #include <exception>
 #include <iostream>
 #include <boost/uuid/detail/md5.hpp>
+#include <boost/crc.hpp>
 
 namespace hashing {
 
@@ -17,7 +18,13 @@ using Byte = unsigned char;
 using hash_t = std::string; //std::vector<Byte>;
 
 hash_t calculate_crc32(const std::string& str) {
-    return "";
+    boost::crc_32_type result;
+    result.process_bytes(str.data(), str.length());
+    
+    std::string out;
+    out.push_back(result.checksum() % 255);
+
+    return out;
 }
 
 hash_t calculate_md5(const std::string& str) {

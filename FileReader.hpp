@@ -9,8 +9,6 @@ enum class ReadStrategy {
 };
 
 struct FileReader {
-    //FileReadStrategy() {}
-
     ~FileReader() {
         if (file_.is_open()){
             file_.close();
@@ -45,6 +43,7 @@ struct FileReaderBlock : public  FileReader {
         }
 
         char* buf = new char[block_size_];
+        std::memset(buf, '\0', block_size_);
 
         file_.read(buf, block_size_);
 
@@ -52,7 +51,9 @@ struct FileReaderBlock : public  FileReader {
 
         if (read_bytes != 0) {
             block.clear();
-            block = buf;
+            for (int i = 0; i < block_size_; ++i) {
+                block.push_back(buf[i]);
+            }
         }
 
         delete[] buf;
