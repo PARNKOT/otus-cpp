@@ -19,26 +19,15 @@ struct FilesComparor {
 
     FilesComparor(const std::vector<path_t>& directories) {
         set_scan_directories(directories);
-        file_reader_ = std::make_shared<FileReaderBlock>(block_size_default);
-    }
-
-    FilesComparor(const std::vector<path_t>& directories, std::shared_ptr<FileReader> file_reader) : file_reader_{file_reader}  {
-        set_scan_directories(directories);
     }
 
     void set_hash_type(hashing::HashType hash_type) {
         hash_type_ = hash_type;
     }
 
-    void set_file_reader(std::shared_ptr<FileReader> file_reader)  {
-        file_reader_ = file_reader;
-    }
-
     void add_exclude_directories(const std::vector<path_t>& exclude) {
-        exclude_directories_.resize(exclude.size());
-
         std::for_each(exclude.cbegin(), exclude.cend(), [&](const auto& dir) {
-            scan_directories_.emplace_back(dir);
+            exclude_directories_.emplace_back(dir);
         });
     }
 
@@ -56,6 +45,10 @@ struct FilesComparor {
         }
 
         if (entry.file_size() == 0) {
+            return false;
+        }
+
+        if (std::find(exclude_directories_.begin(), exclude_directories_.end(), entry.path()) != std::end(exclude_directories_)) {
             return false;
         }
 
@@ -143,6 +136,5 @@ private:
     std::vector<fs::path> exclude_directories_;
     std::string file_mask_;
     uint scan_level_ = 0;
-    std::shared_ptr<FileReader> file_reader_ = nullptr;
     hashing::HashType hash_type_ = hashing::HashType::MD5;
 };

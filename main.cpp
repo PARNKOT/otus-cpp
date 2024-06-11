@@ -13,10 +13,6 @@
 #include "FilesComparor.hpp"
 #include "constants.hpp"
 
-#define SCAN_LEVEL_DEFAULT 1
-#define FILE_MIN_SIZE_DEFAULT 1 // bytes
-#define BLOCK_SIZE_DEFAULT 5
-
 
 int main(int argc, char const *argv[])
 {
@@ -51,7 +47,7 @@ int main(int argc, char const *argv[])
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
 
-    //  Positional options
+    // Positional options
     po::positional_options_description pos_desc;
     pos_desc.add("input-dir", -1);
     po::store(po::command_line_parser(argc, argv).options(desc).positional(pos_desc).run(), vm);
@@ -82,9 +78,10 @@ int main(int argc, char const *argv[])
     for (const auto& dir : scan_directories)
         std::cout << "\t\t- " << dir << std::endl;
 
-    auto file_reader = std::make_shared<FileReaderBlock>(block_size);
 
-    FilesComparor comparor{scan_directories, file_reader};
+    FilesComparor comparor{scan_directories};
+
+exclude_directories.push_back("tests/dir1/");
 
     if (exclude_directories.size() > 0) {
         comparor.add_exclude_directories(exclude_directories);
@@ -98,6 +95,7 @@ int main(int argc, char const *argv[])
         comparor.set_hash_type(hashing::HashType::MD5);
     } else if (boost::iequals(hash, "crc32")) {
         comparor.set_hash_type(hashing::HashType::CRC32);
+    }
     
     comparor.set_scan_level(scan_level);
 
