@@ -48,10 +48,6 @@ struct FilesComparor {
             return false;
         }
 
-        if (std::find(exclude_directories_.begin(), exclude_directories_.end(), entry.path()) != std::end(exclude_directories_)) {
-            return false;
-        }
-
         return true;
     }
 
@@ -85,6 +81,10 @@ struct FilesComparor {
 
         std::for_each(scan_directories_.cbegin(), scan_directories_.cend(), [&](const auto& dir){
             if (!fs::exists(dir)) {
+                return;
+            }
+
+            if (std::find(exclude_directories_.begin(), exclude_directories_.end(), dir) != std::end(exclude_directories_)) {
                 return;
             }
 

@@ -81,8 +81,6 @@ int main(int argc, char const *argv[])
 
     FilesComparor comparor{scan_directories};
 
-exclude_directories.push_back("tests/dir1/");
-
     if (exclude_directories.size() > 0) {
         comparor.add_exclude_directories(exclude_directories);
     }
