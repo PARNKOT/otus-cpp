@@ -16,6 +16,10 @@ using namespace bulk;
 // Public
 
 void Bulk::execute() {
+    for (const auto& obs : observers_) {
+        obs->run();
+    }
+
     int block_counter = 0;
     command_t cmd;
 
@@ -64,7 +68,11 @@ void Bulk::add_printer(printer_ptr printer)  {
 
 void Bulk::notify() {
     for (const auto& observer : observers_)   {
-        observer->print(cmds_);
+        // TODO: Реализовать распределение команд по принтерам
+        
+        for (const auto& cmd : cmds_) {
+            observer->print(cmd);
+        }
     }
 }
 
@@ -92,4 +100,41 @@ void FilePrinter::print(const commands& cmds) {
     if (file.is_open()) {
         print_(file, cmds);
     }
+}
+
+
+void AsyncPrinter::print(const command_t& cmd) {
+    std::lock_guard<std::mutex> lock(cmds_mutex_);
+
+    cmds_.push(cmd);
+}
+
+void AsyncPrinter::worker() {
+    commands to_print;
+    
+    while (true) {
+        if (cmds_.size() == 0) continue;
+        
+        {
+            std::lock_guard<std::mutex> lock(cmds_mutex_);
+
+            while (!cmds_.empty()) {
+                to_print.push_back(cmds_.front());
+                cmds_.pop();
+            }
+        }
+
+        printer_->print(to_print);
+        to_print.clear();
+    }
+}
+
+void AsyncPrinter::run() {
+    if  (printer_ == nullptr) {
+        throw std::runtime_error("NULL printer");
+    }
+
+    if (f_.valid()) return;
+
+    f_ = std::async(std::launch::async, &AsyncPrinter::worker, this);
 }

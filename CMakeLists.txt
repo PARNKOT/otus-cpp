@@ -10,6 +10,7 @@ endif()
 
 option(WITH_BOOST_TEST "Whether to build Boost test" OFF)
 
+find_package(Threads REQUIRED)
 
 configure_file(version.hpp.in version.hpp)
 include_directories(${CMAKE_BINARY_DIR})
@@ -20,6 +21,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
 )
+
+target_link_libraries(${PROJECT_NAME} Threads::Threads)
 
 if(WITH_BOOST_TEST)
     find_package(Boost COMPONENTS unit_test_framework REQUIRED)

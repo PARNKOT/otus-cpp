@@ -3,7 +3,7 @@ name: "C++ CI"
 on:
   push:
     branches:
-      - 07_homework
+      - 09_homework
 
 jobs:
   build:
@@ -24,8 +24,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: 07_homework_parser_${{ github.run_number }}
-          release_name: Release 07_homework_parser ${{ github.run_number }}
+          tag_name: 09_homework_async_${{ github.run_number }}
+          release_name: Release 09_homework_async ${{ github.run_number }}
           draft: false
           prerelease: false
       - name: Upload Release Asset
@@ -35,6 +35,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bulk-0.0.${{ github.run_number }}-Linux.deb
-          asset_name: bulk-0.0.${{ github.run_number }}-Linux.deb
+          asset_path: ./async-0.0.${{ github.run_number }}-Linux.deb
+          asset_name: async-0.0.${{ github.run_number }}-Linux.deb
           asset_content_type: application/vnd.debian.binary-package

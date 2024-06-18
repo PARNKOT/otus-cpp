@@ -22,8 +22,11 @@ int main(int argc, char const *argv[])
     auto console_printer = std::make_shared<bulk::ConsolePrinter>();
     auto file_printer = std::make_shared<bulk::FilePrinter>(std::filesystem::path("./test.txt"));
 
-    b.add_printer(console_printer);
-    b.add_printer(file_printer);
+
+    // b.add_printer(console_printer);
+    // b.add_printer(file_printer);
+    b.add_printer(std::make_shared<bulk::AsyncPrinter>(console_printer));
+    b.add_printer(std::make_shared<bulk::AsyncPrinter>(file_printer));
     b.execute();
 
     return 0;
