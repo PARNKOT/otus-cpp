@@ -19,6 +19,8 @@ namespace bulk {
         //     });
         // }
         
+        virtual bool is_console_printer() { return false; }
+
     protected:
         template <typename Output, typename Iterable>
         void print_(Output& output, Iterable container) {
@@ -41,6 +43,9 @@ namespace bulk {
 
     struct ConsolePrinter : public Printer {
         virtual void print(const commands& cmds)  override;
+        virtual bool is_console_printer() override {
+            return true;
+        }
     };
 
     struct FilePrinter : public Printer {
@@ -56,14 +61,19 @@ namespace bulk {
         AsyncPrinter(std::shared_ptr<Printer> printer) : printer_{printer} {}
 
         void print(const command_t& cmd);
+        void print(const commands& cmds);
         void worker();
         void run();
+        void stop();
+
+        bool is_console_printer() { return printer_->is_console_printer(); }
 
         private:
             std::future<void> f_;
             std::shared_ptr<Printer> printer_ = nullptr;
             std::queue<command_t> cmds_;
             std::mutex cmds_mutex_;
+            std::atomic_bool need_stop_ = false;
     };
 
     struct Bulk {
@@ -71,10 +81,19 @@ namespace bulk {
         using printer_ptr = std::shared_ptr<AsyncPrinter>;
 
         explicit Bulk(int block_size) : block_size_(block_size) {}
-        void execute();
+        ~Bulk() {
+            for (auto& observer : observers_) {
+                if constexpr (std::is_same_v<std::remove_reference_t<decltype(observer)>::element_type, AsyncPrinter>) {
+                    observer->stop();
+                }
+            }
+        }
+
+        void execute(const commands& cmds);
 
         void add_printer(printer_ptr printer);
         void notify();
+        void notify(const commands& cmds);
 
     private:
         void execute_commands();

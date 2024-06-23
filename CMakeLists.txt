@@ -18,7 +18,7 @@ include_directories(${CMAKE_BINARY_DIR})
 add_executable(${PROJECT_NAME} main.cpp bulk.cpp)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
 )
 

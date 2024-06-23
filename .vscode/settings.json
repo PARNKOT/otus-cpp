@@ -68,6 +68,6 @@
         "future": "cpp"
     },
     "cmake.debugConfig": {
-        "args": ["< ../ip_filter.tsv"]
+        "args": ["2"]
     }
 }

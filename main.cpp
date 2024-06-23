@@ -8,6 +8,7 @@
 
 #include "version.hpp"
 #include "bulk.hpp"
+#include "async.h"
 
 
 int main(int argc, char const *argv[])
@@ -17,17 +18,12 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
-    bulk::Bulk b(std::stoi(argv[1], nullptr, 10));
-
-    auto console_printer = std::make_shared<bulk::ConsolePrinter>();
-    auto file_printer = std::make_shared<bulk::FilePrinter>(std::filesystem::path("./test.txt"));
-
-
-    // b.add_printer(console_printer);
-    // b.add_printer(file_printer);
-    b.add_printer(std::make_shared<bulk::AsyncPrinter>(console_printer));
-    b.add_printer(std::make_shared<bulk::AsyncPrinter>(file_printer));
-    b.execute();
+    auto block_size = std::stoi(argv[1], nullptr, 10);
+    auto context = connect(block_size);
+    
+    buffer_t cmds = {"cmd1", "cmd2", "{", "cmd3", "cmd4", "cmd5", "}", "cmd6"};
+    receive(&cmds, cmds.size(), context);
+    disconnect(std::move(context));
 
     return 0;
 }

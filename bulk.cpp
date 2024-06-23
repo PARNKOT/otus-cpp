@@ -15,20 +15,24 @@ using namespace bulk;
 
 // Public
 
-void Bulk::execute() {
-    for (const auto& obs : observers_) {
-        obs->run();
-    }
+void Bulk::execute(const commands& cmds) {
+    // for (const auto& obs : observers_) {
+    //     obs->run();
+    // }
+
+    std::cout << "Start executing" << std::endl;
 
     int block_counter = 0;
     command_t cmd;
 
-    while(true) {
-        std::cin >> cmd;
-
-        if (std::cin.eof()) {
+    for(int i = 0; true; ++i) {
+        //std::cin >> cmd;
+        //std::cout << "Step " << i << std::endl;
+        if (i >= cmds.size()) {
             break;
         }
+
+        cmd = cmds.at(i);
 
         if (cmd == CMD_START_BLOCK) {
             if (block_counter == 0) {
@@ -64,6 +68,11 @@ void Bulk::execute() {
 
 void Bulk::add_printer(printer_ptr printer)  {
     observers_.push_back(printer);
+
+    if constexpr (std::is_same_v<printer_ptr::element_type, AsyncPrinter>)  {
+        std::cout << "Run async printer" << std::endl;
+        printer->run();
+    }
 }
 
 void Bulk::notify() {
@@ -76,10 +85,33 @@ void Bulk::notify() {
     }
 }
 
+void Bulk::notify(const commands& cmds) {
+    int cmds_per_file_printer = (observers_.size() - 1) != 0 ? cmds.size() / (observers_.size() - 1) : 0;
+    int pos = 0;
+    for (const auto& observer : observers_)   {
+        // TODO: Реализовать распределение команд по принтерам
+        if (observer->is_console_printer()) {
+            //std::cout << "Call print of console printer" << std::endl;
+            observer->print(cmds);
+            continue;
+        }
+        
+        //std::cout << "Call print of file printer" << std::endl;
+        int start = pos;
+        int end =  cmds_per_file_printer == 0 ? cmds.size() : pos + cmds_per_file_printer;
+        //std::cout << "start = "  << start << ", end = " << end;
+        for (int i = start; i < end; ++i) {
+            observer->print(cmds[i]);
+        }
+
+        pos = end;
+    }
+}
+
 // Private
 
 void Bulk::execute_commands() {
-    notify();
+    notify(cmds_);
     cmds_.clear();
 }
 
@@ -109,10 +141,18 @@ void AsyncPrinter::print(const command_t& cmd) {
     cmds_.push(cmd);
 }
 
+void AsyncPrinter::print(const commands& cmds) {
+    std::lock_guard<std::mutex> lock(cmds_mutex_);
+
+    for (const auto& cmd : cmds) {
+        cmds_.push(cmd);
+    }
+}
+
 void AsyncPrinter::worker() {
     commands to_print;
     
-    while (true) {
+    while (!need_stop_.load()) {
         if (cmds_.size() == 0) continue;
         
         {
@@ -137,4 +177,9 @@ void AsyncPrinter::run() {
     if (f_.valid()) return;
 
     f_ = std::async(std::launch::async, &AsyncPrinter::worker, this);
+}
+
+void AsyncPrinter::stop()  {
+    while (cmds_.size() != 0) {}
+    need_stop_.store(true);
 }
