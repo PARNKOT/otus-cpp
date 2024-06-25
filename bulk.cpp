@@ -16,18 +16,12 @@ using namespace bulk;
 // Public
 
 void Bulk::execute(const commands& cmds) {
-    // for (const auto& obs : observers_) {
-    //     obs->run();
-    // }
-
     std::cout << "Start executing" << std::endl;
 
     int block_counter = 0;
     command_t cmd;
 
     for(int i = 0; true; ++i) {
-        //std::cin >> cmd;
-        //std::cout << "Step " << i << std::endl;
         if (i >= cmds.size()) {
             break;
         }
@@ -77,8 +71,7 @@ void Bulk::add_printer(printer_ptr printer)  {
 
 void Bulk::notify() {
     for (const auto& observer : observers_)   {
-        // TODO: Реализовать распределение команд по принтерам
-        
+       
         for (const auto& cmd : cmds_) {
             observer->print(cmd);
         }
@@ -89,17 +82,13 @@ void Bulk::notify(const commands& cmds) {
     int cmds_per_file_printer = (observers_.size() - 1) != 0 ? cmds.size() / (observers_.size() - 1) : 0;
     int pos = 0;
     for (const auto& observer : observers_)   {
-        // TODO: Реализовать распределение команд по принтерам
         if (observer->is_console_printer()) {
-            //std::cout << "Call print of console printer" << std::endl;
             observer->print(cmds);
             continue;
         }
         
-        //std::cout << "Call print of file printer" << std::endl;
         int start = pos;
         int end =  cmds_per_file_printer == 0 ? cmds.size() : pos + cmds_per_file_printer;
-        //std::cout << "start = "  << start << ", end = " << end;
         for (int i = start; i < end; ++i) {
             observer->print(cmds[i]);
         }

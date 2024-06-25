@@ -12,8 +12,11 @@ context_t connect(uint64_t block_size) {
     auto context = std::make_unique<bulk::Bulk>(block_size);
 
     auto console_printer = std::make_shared<bulk::ConsolePrinter>();
-    auto file1_printer = std::make_shared<bulk::FilePrinter>(std::filesystem::path("./file1.txt"));
-    auto file2_printer = std::make_shared<bulk::FilePrinter>(std::filesystem::path("./file2.txt"));
+    auto now = std::chrono::steady_clock::now().time_since_epoch().count();
+    auto filename1 = "file1_" + std::to_string(now) + ".txt";
+    auto filename2 = "file2_" + std::to_string(now) + ".txt";
+    auto file1_printer = std::make_shared<bulk::FilePrinter>(std::filesystem::path(filename1));
+    auto file2_printer = std::make_shared<bulk::FilePrinter>(std::filesystem::path(filename2));
 
     context->add_printer(std::make_shared<bulk::AsyncPrinter>(console_printer));
     context->add_printer(std::make_shared<bulk::AsyncPrinter>(file1_printer));
@@ -23,12 +26,7 @@ context_t connect(uint64_t block_size) {
 }
 
 void receive(buffer_t* buf, uint64_t size, const context_t& context) {
-    // bulk::commands cmds;
-    // cmds.reserve(size);
-    // std::copy(buf, buf + size, std::back_inserter(cmds));
-
     context->execute(*buf);
-    //context->notify(*buf);
 }
 
 void disconnect(context_t context) {

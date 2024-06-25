@@ -13,11 +13,6 @@ namespace bulk {
 
     struct Printer {
         virtual void print(const commands& cmds) = 0;
-        // virtual void print(const commands& cmds) {
-        //     std::for_each(cmds.cbegin(), cmds.cend(), [&](const auto& cmd) {
-        //         return;
-        //     });
-        // }
         
         virtual bool is_console_printer() { return false; }
 
@@ -77,7 +72,6 @@ namespace bulk {
     };
 
     struct Bulk {
-        // using printer_ptr = std::shared_ptr<Printer>;
         using printer_ptr = std::shared_ptr<AsyncPrinter>;
 
         explicit Bulk(int block_size) : block_size_(block_size) {}
