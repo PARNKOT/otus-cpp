@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(async)
+project(bulk_server)
 
 if(DEFINED ENV{GITHUB_RUN_NUMBER})
     project(${PROJECT_NAME} VERSION 0.0.$ENV{GITHUB_RUN_NUMBER})
@@ -15,22 +15,16 @@ find_package(Threads REQUIRED)
 configure_file(version.hpp.in version.hpp)
 include_directories(${CMAKE_BINARY_DIR})
 
-add_library(${PROJECT_NAME} SHARED async.h bulk.cpp)
+find_package(Boost REQUIRED COMPONENTS system thread regex)
 
-add_executable(async_example main.cpp bulk.cpp)
-#add_executable(${PROJECT_NAME} main.cpp bulk.cpp)
+add_executable(${PROJECT_NAME} main.cpp)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
 )
 
-set_target_properties(async_example PROPERTIES
-    CXX_STANDARD 20
-    CXX_STANDARD_REQUIRED ON
-)
-
-target_link_libraries(async_example Threads::Threads async)
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_REGEX_LIBRARY})
 
 if(WITH_BOOST_TEST)
     find_package(Boost COMPONENTS unit_test_framework REQUIRED)
@@ -54,7 +48,6 @@ if(WITH_BOOST_TEST)
 endif()
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
-install(TARGETS async_example RUNTIME DESTINATION bin)
 
 set(CPACK_GENERATOR DEB)
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
