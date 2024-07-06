@@ -68,6 +68,6 @@
         "future": "cpp"
     },
     "cmake.debugConfig": {
-        "args": ["2"]
+        "args": ["10100", "3"]
     }
 }

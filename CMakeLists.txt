@@ -17,7 +17,7 @@ include_directories(${CMAKE_BINARY_DIR})
 
 find_package(Boost REQUIRED COMPONENTS system thread regex)
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} main.cpp bulk.cpp)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD 20
