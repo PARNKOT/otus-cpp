@@ -26,8 +26,16 @@ namespace db {
             data_.push_back(data);
         }
 
+        void clear() {
+            data_.clear();
+        }
+
         Data at(std::size_t index) {
             return data_.at(index);
+        }
+
+        std::vector<Data>& data() const {
+            return data_;
         }
     private:
         std::string name_;
@@ -54,17 +62,51 @@ namespace db {
             table.push_back(data);
         }
 
+        void truncate(table_t& table) {
+            table.clear();
+        }
+
         table_t& get_table(const std::string& table_name) {
             for (auto& t : tables_ ) {
                 if (t.name() == table_name){
                     return t;
                 }
             }
+
+            throw std::runtime_error("Cannot find table");
         }
 
     private:
         std::vector<table_t> tables_;
     };
+
+    namespace operations {
+        template <typename table_type>
+        std::vector<std::string> intersection(const table_type& table1, const table_type& table2) {          
+            // TODO: implement
+            
+            int first = table1.data().at(0).id;
+            int second = table2.data().at(0).id;
+
+
+            if (first == second) {
+
+            }
+        }
+
+        template <typename table_type>
+        std::vector<std::string> symmetric_difference(const table_type& table1, const table_type& table2) {          
+            // TODO: implement
+            
+            int first = table1.data().at(0).id;
+            int second = table2.data().at(0).id;
+
+
+            if (first == second) {
+
+            }
+        }
+    }
 
     namespace sql {
         enum class SqlCommand {
@@ -75,7 +117,7 @@ namespace db {
             UNKNOWN = -1,
         };
 
-        struct SqlQueryDescription{
+        struct SqlQueryDescription {
             SqlCommand cmd = SqlCommand::UNKNOWN;
             std::vector<std::string> tables;
             std::vector<std::string> data;
@@ -108,7 +150,7 @@ namespace db {
                 auto new_pos = query.find(' ', ws_pos);
 
                 if (new_pos == std::string::npos) {
-                    break;
+                    new_pos = query.at(query.size()-1) == '\n' ? query.size() - 1 : query.size();
                 }
 
                 if (new_pos == ws_pos) {
@@ -137,11 +179,68 @@ namespace db {
                     break;
                 }
 
+                if (new_pos >= query.size() - 1) {
+                    break;
+                }
+
                 ws_pos = new_pos + 1;
 
             }
 
             return desc;
         }
+
+        template <typename DB>
+        bool insert_to_db(DB& db, const SqlQueryDescription& desc) {
+            Person person;
+            
+            if (desc.data.size() < 2) {
+                return false;
+            }
+
+            person.id = std::stoi(desc.data.at(0), nullptr, 10);
+            person.name = desc.data.at(1);
+
+            try {
+                auto table = db.get_table(desc.tables.at(0));
+                db.insert(table, person);
+            } catch (std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+                return false;
+            }
+
+            return true;
+        }
+
+        template <typename DB>
+        bool truncate_table(DB& db, const SqlQueryDescription& desc) {
+            try {
+                auto table = db.get_table(desc.tables.at(0));
+                db.truncate(table);
+            } catch (std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+                return false;
+            }
+
+            return true;
+        }
+
+        template <typename DB>
+        std::string intersection(DB& db, const std::string& table_name1, const std::string& table_name2) {          
+            try {
+                auto table1 = db.get_table(table_name1);
+                auto table2 = db.get_table(table_name2);
+                return db::operations::intersection(table1, table2);
+            } catch (std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+                return "ERR: failed to find intersection";
+            }
+        }
+
+        template <typename DB>
+        std::string symmetric_difference(DB& db, const std::string& table_name1, const std::string& table_name2) {
+            
+        }
+        
     }
 }

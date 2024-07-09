@@ -42,21 +42,35 @@ private:
                 std::string query{data_, length};
                 auto sql_desc = db::sql::parse_query(query);
 
-                std::cout << "Parsed sql query: command = " << static_cast<int>(sql_desc.cmd) << ", table = " << sql_desc.tables.at(0) << ", data = ";
-                for (const auto& data : sql_desc.data) {
-                    std::cout << data << ", ";
-                }
-                std::cout << std::endl;
+                std::string response;
 
-                do_write(length);
+                switch (sql_desc.cmd)
+                {
+                case db::sql::SqlCommand::INSERT:
+                    response = db::sql::insert_to_db(*db_, sql_desc) ? "< OK" : "< ERR: cannot insert data";
+                    break;
+                case db::sql::SqlCommand::TRUNCATE:
+                    response = db::sql::truncate_table(*db_, sql_desc) ? "< OK" : "< ERR: cannot truncate table";
+                    break;
+                case db::sql::SqlCommand::INTERSECTION:
+
+                    break;
+                case db::sql::SqlCommand::SYMMETRIC_DIFFERENCE:
+
+                    break;
+                default:
+                    break;
+                }
+
+                do_write(response);
             }
         });
     }
 
-    void do_write(std::size_t length)
+    void do_write(std::string response)
     {
         auto self = shared_from_this();
-        boost::asio::async_write(socket_, boost::asio::buffer(data_, length),
+        boost::asio::async_write(socket_, boost::asio::buffer(response),
             [this, self](boost::system::error_code ec, std::size_t /*length*/)
             {
                 if (!ec)

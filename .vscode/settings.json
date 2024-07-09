@@ -65,7 +65,8 @@
         "cfenv": "cpp",
         "typeindex": "cpp",
         "variant": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "csignal": "cpp"
     },
     "cmake.debugConfig": {
         "args": ["10100", "3"]
