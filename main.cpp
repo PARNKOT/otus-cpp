@@ -53,7 +53,7 @@ private:
                     response = db::sql::truncate_table(*db_, sql_desc) ? "< OK" : "< ERR: cannot truncate table";
                     break;
                 case db::sql::SqlCommand::INTERSECTION:
-
+                    response = db::sql::intersection(*db_, "A", "B");
                     break;
                 case db::sql::SqlCommand::SYMMETRIC_DIFFERENCE:
 

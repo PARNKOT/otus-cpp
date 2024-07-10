@@ -2,12 +2,18 @@
 
 #include <string>
 #include <vector>
+#include <set>
+#include <algorithm>
 
 namespace db {
     struct Person {
         int id;
         std::string name;
     };
+
+    // bool operator<(const Person& left, const Person& right) {
+    //     return left.id < right.id;
+    // }
 
     template <typename Data>
     class Table {
@@ -24,6 +30,7 @@ namespace db {
 
         void push_back(const Data& data) {
             data_.push_back(data);
+            //data_.insert(data);
         }
 
         void clear() {
@@ -34,12 +41,13 @@ namespace db {
             return data_.at(index);
         }
 
-        std::vector<Data>& data() const {
+        const std::vector<Data>& data() const {
             return data_;
         }
     private:
         std::string name_;
         std::vector<Data> data_;
+        //std::set<Data> data_;
     };
 
     template <typename table_type>
@@ -84,27 +92,28 @@ namespace db {
         template <typename table_type>
         std::vector<std::string> intersection(const table_type& table1, const table_type& table2) {          
             // TODO: implement
-            
-            int first = table1.data().at(0).id;
-            int second = table2.data().at(0).id;
+            std::vector<std::string> out;
 
+            std::vector<typename table_type::data_type> intersection;
+            std::set_intersection(table1.data().cbegin(), table1.data().cend(),
+                                  table2.data().cbegin(), table2.data().cend(), std::back_inserter(intersection),
+                                  [](const auto& left, const auto& right) {
+                                    return left.id == right.id;
+                                  });
 
-            if (first == second) {
-
+            for (const auto& el : intersection) {
+                std::cout << el.id << ", " << el.name << std::endl;
             }
+
+            return out;
         }
 
         template <typename table_type>
         std::vector<std::string> symmetric_difference(const table_type& table1, const table_type& table2) {          
             // TODO: implement
+            std::vector<std::string> out;
             
-            int first = table1.data().at(0).id;
-            int second = table2.data().at(0).id;
-
-
-            if (first == second) {
-
-            }
+            return out;
         }
     }
 
@@ -230,7 +239,8 @@ namespace db {
             try {
                 auto table1 = db.get_table(table_name1);
                 auto table2 = db.get_table(table_name2);
-                return db::operations::intersection(table1, table2);
+                auto res = db::operations::intersection(table1, table2);
+                return "";
             } catch (std::exception& ex) {
                 std::cout << ex.what() << std::endl;
                 return "ERR: failed to find intersection";
@@ -239,7 +249,7 @@ namespace db {
 
         template <typename DB>
         std::string symmetric_difference(DB& db, const std::string& table_name1, const std::string& table_name2) {
-            
+            return "";
         }
         
     }
