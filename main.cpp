@@ -53,13 +53,20 @@ private:
                     response = db::sql::truncate_table(*db_, sql_desc) ? "< OK" : "< ERR: cannot truncate table";
                     break;
                 case db::sql::SqlCommand::INTERSECTION:
-
+                    response = db::sql::intersection(*db_, sql_desc);
                     break;
                 case db::sql::SqlCommand::SYMMETRIC_DIFFERENCE:
-
+                    response = db::sql::symmetric_difference(*db_, sql_desc);
                     break;
                 default:
                     break;
+                }
+
+                auto tableA = db_->get_table("A");
+                auto tableB = db_->get_table("B");
+
+                for (const auto& el : tableA.data()) {
+                    std::cout << el.id << ", " << el.name << std::endl;
                 }
 
                 do_write(response);

@@ -34,7 +34,7 @@ namespace db {
             return data_.at(index);
         }
 
-        std::vector<Data>& data() const {
+        const std::vector<Data>& data() const {
             return data_;
         }
     private:
@@ -202,7 +202,7 @@ namespace db {
             person.name = desc.data.at(1);
 
             try {
-                auto table = db.get_table(desc.tables.at(0));
+                auto& table = db.get_table(desc.tables.at(0));
                 db.insert(table, person);
             } catch (std::exception& ex) {
                 std::cout << ex.what() << std::endl;
@@ -215,7 +215,7 @@ namespace db {
         template <typename DB>
         bool truncate_table(DB& db, const SqlQueryDescription& desc) {
             try {
-                auto table = db.get_table(desc.tables.at(0));
+                auto& table = db.get_table(desc.tables.at(0));
                 db.truncate(table);
             } catch (std::exception& ex) {
                 std::cout << ex.what() << std::endl;
@@ -226,10 +226,13 @@ namespace db {
         }
 
         template <typename DB>
-        std::string intersection(DB& db, const std::string& table_name1, const std::string& table_name2) {          
+        std::string intersection(DB& db, const SqlQueryDescription& desc) {          
             try {
-                auto table1 = db.get_table(table_name1);
-                auto table2 = db.get_table(table_name2);
+                const std::string& table_name1 = desc.tables.at(0);
+                const std::string& table_name2 = desc.tables.at(1);
+
+                auto& table1 = db.get_table(table_name1);
+                auto& table2 = db.get_table(table_name2);
                 return db::operations::intersection(table1, table2);
             } catch (std::exception& ex) {
                 std::cout << ex.what() << std::endl;
@@ -238,8 +241,18 @@ namespace db {
         }
 
         template <typename DB>
-        std::string symmetric_difference(DB& db, const std::string& table_name1, const std::string& table_name2) {
-            
+        std::string symmetric_difference(DB& db, const SqlQueryDescription& desc) {
+            try {
+                const std::string& table_name1 = desc.tables.at(0);
+                const std::string& table_name2 = desc.tables.at(1);
+
+                auto& table1 = db.get_table(table_name1);
+                auto& table2 = db.get_table(table_name2);
+                return db::operations::symmetric_difference(table1, table2);
+            } catch (std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+                return "ERR: failed to find symmetric difference";
+            }
         }
         
     }
