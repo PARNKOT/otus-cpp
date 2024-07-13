@@ -2,6 +2,9 @@
 
 #include <string>
 #include <vector>
+#include <set>
+#include <algorithm>
+#include <sstream>
 
 namespace db {
     struct Person {
@@ -40,6 +43,7 @@ namespace db {
     private:
         std::string name_;
         std::vector<Data> data_;
+        //std::set<Data> data_;
     };
 
     template <typename table_type>
@@ -82,29 +86,42 @@ namespace db {
 
     namespace operations {
         template <typename table_type>
-        std::vector<std::string> intersection(const table_type& table1, const table_type& table2) {          
-            // TODO: implement
-            
-            int first = table1.data().at(0).id;
-            int second = table2.data().at(0).id;
+        std::vector<std::string> intersection(const table_type& table1, const table_type& table2) {
+            std::vector<std::string> out;
 
+            std::vector<typename table_type::data_type> intersection;
+            std::set_intersection(table1.data().cbegin(), table1.data().cend(),
+                                  table2.data().cbegin(), table2.data().cend(), std::back_inserter(intersection),
+                                  [](const auto& left, const auto& right) {
+                                    return left.id != right.id;
+                                  });
 
-            if (first == second) {
-
+            for (const auto& el : intersection) {
+                auto first = std::find_if(table1.data().cbegin(), table1.data().cend(), [&](const auto& t) { return t.id == el.id; });
+                auto second = std::find_if(table2.data().cbegin(), table2.data().cend(), [&](const auto& t) { return t.id == el.id; });
+                out.push_back(std::to_string(el.id) + "," + (*first).name + "," + (*second).name);
+                std::cout << el.id << ", " << el.name << std::endl;
             }
+
+            return out;
         }
 
         template <typename table_type>
-        std::vector<std::string> symmetric_difference(const table_type& table1, const table_type& table2) {          
-            // TODO: implement
+        std::vector<std::string> symmetric_difference(const table_type& table1, const table_type& table2) {
+            std::vector<std::string> out;
             
-            int first = table1.data().at(0).id;
-            int second = table2.data().at(0).id;
+            std::vector<typename table_type::data_type> symmetric_difference;
+            std::set_symmetric_difference(table1.data().cbegin(), table1.data().cend(),
+                                  table2.data().cbegin(), table2.data().cend(), std::back_inserter(symmetric_difference),
+                                  [](const auto& left, const auto& right) {
+                                    return left.id != right.id;
+                                  });
 
-
-            if (first == second) {
-
+            for (const auto& el : symmetric_difference) {
+                out.push_back(std::to_string(el.id) + "," + el.name);
             }
+
+            return out;
         }
     }
 
@@ -233,7 +250,14 @@ namespace db {
 
                 auto& table1 = db.get_table(table_name1);
                 auto& table2 = db.get_table(table_name2);
-                return db::operations::intersection(table1, table2);
+                auto res = db::operations::intersection(table1, table2);
+
+                std::stringstream  ss;
+                for (const auto& s : res) {
+                    ss << "< " << s << std::endl;
+                }
+
+                return ss.str();
             } catch (std::exception& ex) {
                 std::cout << ex.what() << std::endl;
                 return "ERR: failed to find intersection";
@@ -248,7 +272,14 @@ namespace db {
 
                 auto& table1 = db.get_table(table_name1);
                 auto& table2 = db.get_table(table_name2);
-                return db::operations::symmetric_difference(table1, table2);
+                auto res = db::operations::symmetric_difference(table1, table2);
+
+                std::stringstream  ss;
+                for (const auto& s : res) {
+                    ss << "< " << s << std::endl;
+                }
+
+                return ss.str();
             } catch (std::exception& ex) {
                 std::cout << ex.what() << std::endl;
                 return "ERR: failed to find symmetric difference";

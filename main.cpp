@@ -13,7 +13,7 @@
 using boost::asio::ip::tcp;
 using db::Person, db::Table, db::Database;
 using database_t = Database<Table<Person>>;
-using db_pointer = std::shared_ptr<database_t>; //std::unique_ptr<database_t>;
+using db_pointer = std::shared_ptr<database_t>;
 
 class session
   : public std::enable_shared_from_this<session>
@@ -53,20 +53,17 @@ private:
                     response = db::sql::truncate_table(*db_, sql_desc) ? "< OK" : "< ERR: cannot truncate table";
                     break;
                 case db::sql::SqlCommand::INTERSECTION:
+                    sql_desc.tables.push_back("A");
+                    sql_desc.tables.push_back("B");
                     response = db::sql::intersection(*db_, sql_desc);
                     break;
                 case db::sql::SqlCommand::SYMMETRIC_DIFFERENCE:
+                    sql_desc.tables.push_back("A");
+                    sql_desc.tables.push_back("B");
                     response = db::sql::symmetric_difference(*db_, sql_desc);
                     break;
                 default:
                     break;
-                }
-
-                auto tableA = db_->get_table("A");
-                auto tableB = db_->get_table("B");
-
-                for (const auto& el : tableA.data()) {
-                    std::cout << el.id << ", " << el.name << std::endl;
                 }
 
                 do_write(response);
