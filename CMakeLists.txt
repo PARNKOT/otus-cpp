@@ -10,11 +10,14 @@ endif()
 
 option(WITH_BOOST_TEST "Whether to build Boost test" ON)
 
-
 configure_file(version.hpp.in version.hpp)
+
+find_package(yaml-cpp REQUIRED)
+
 include_directories(${CMAKE_BINARY_DIR})
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp src/YamlReader.cpp)
+target_link_libraries(${PROJECT_NAME} yaml-cpp)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD 17

@@ -1,0 +1,29 @@
+structures:
+  - name: "Rayan"
+    fields:
+      - name: "bool_var"
+        type: bool
+      - name: "int8_var"
+        type: int8_t
+      - name: "int16_var"
+        type: int16_t
+      - name: "int32_var"
+        type: int32_t
+      - name: "int64_var"
+        type: int64_t
+  - name: "Gosling"
+    fields:
+      - name: "uint8_var"
+        type: uint8_t
+      - name: "uint16_var"
+        type: uint16_t
+      - name: "uint32_var"
+        type: uint32_t
+      - name: "uin64_var"
+        type: uint64_t
+      - name: "double_var"
+        type: double
+      - name: "string_var"
+        type: string
+  
+
