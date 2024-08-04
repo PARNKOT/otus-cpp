@@ -1,0 +1,43 @@
+#pragma once
+
+struct {{ struct_name }} {
+{% for field in fields %}
+    {{ field.type }} {{ field.name }};    
+{% endfor %}
+};
+
+
+class {{ struct_name }}_encryptor {
+public:
+    using encryptor_out_t = {{ encrypt_type }};
+
+    {{ struct_name }}_encryptor() {}
+
+    encryptor_out_t encrypt(const {{ struct_name }}& user_struct) {
+        encryptor_out_t out;
+
+        // ...
+
+        return out;
+    }
+
+private:
+}
+
+
+class {{ struct_name }}_decryptor {
+public:
+    using decryptor_in_t = {{ encrypt_type }};
+
+    {{ struct_name }}_decryptor() {}
+
+    {{ struct_name }} decrypt(const decryptor_in_t& msg) {
+        {{ struct_name }} user_struct;
+
+        // ...
+
+        return user_struct;
+    }
+
+private:
+};
