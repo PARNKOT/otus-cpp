@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(helloworld)
+project(application)
 
 if(DEFINED ENV{GITHUB_RUN_NUMBER})
     project(${PROJECT_NAME} VERSION 0.0.$ENV{GITHUB_RUN_NUMBER})
@@ -16,7 +16,7 @@ find_package(yaml-cpp REQUIRED)
 
 include_directories(${CMAKE_BINARY_DIR})
 
-add_executable(${PROJECT_NAME} src/main.cpp src/YamlReader.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp src/YamlReader.cpp src/Field.cpp)
 target_link_libraries(${PROJECT_NAME} yaml-cpp)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

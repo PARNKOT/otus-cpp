@@ -20,3 +20,5 @@ struct Field {
     std::string name;
     FieldType type;
 };
+
+FieldType string_to_type(const std::string& type);
