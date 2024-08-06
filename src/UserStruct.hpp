@@ -25,3 +25,5 @@ private:
     Fields fields_;
 
 };
+
+using UserStructArray = std::vector<UserStruct>;

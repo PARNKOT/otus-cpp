@@ -3,6 +3,7 @@
 #include <yaml-cpp/yaml.h>
 #include "version.hpp"
 #include "YamlReader.hpp"
+#include "CppGenerator.hpp"
 
 void print_struct_array(const UserStructArray& arr) {
     for (const auto& s : arr) {
@@ -29,6 +30,12 @@ int main(int argc, char* argv[])  {
     }
 
     print_struct_array(struct_array);
+
+    std::unique_ptr<CodeGenerator> generator = std::make_unique<CppGenerator>("./templates/cpp_h.txt");
+
+    for (const auto& s : struct_array) {
+        generator->generate(s);
+    }
 
     return 0;
 }

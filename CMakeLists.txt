@@ -14,9 +14,14 @@ configure_file(version.hpp.in version.hpp)
 
 find_package(yaml-cpp REQUIRED)
 
-include_directories(${CMAKE_BINARY_DIR})
+include_directories(${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/3rdparty)
 
-add_executable(${PROJECT_NAME} src/main.cpp src/YamlReader.cpp src/Field.cpp)
+add_executable(${PROJECT_NAME}
+               src/main.cpp
+               src/YamlReader.cpp
+               src/Field.cpp
+               src/CppGenerator.cpp)
+
 target_link_libraries(${PROJECT_NAME} yaml-cpp)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
