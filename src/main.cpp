@@ -34,7 +34,8 @@ int main(int argc, char* argv[])  {
     std::unique_ptr<CodeGenerator> generator = std::make_unique<CppGenerator>("./templates/cpp_h.txt");
 
     for (const auto& s : struct_array) {
-        generator->generate(s);
+        auto str = generator->generate(s);
+        std::cout << str << std::endl;
     }
 
     return 0;
