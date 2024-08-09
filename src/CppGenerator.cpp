@@ -34,16 +34,16 @@ std::string CppGenerator::generate(const UserStruct& user_struct) {
     return render_str;
 }
 
-std::string generate_encryptor_code(const UserStruct& user_struct, const std::string& encrypt_type) {
-    std::string out;
+std::string CppGenerator::generate_encryptor_code(const UserStruct& user_struct, const std::string& encrypt_type) {
+    std::string out = encrypt_type + "\n";
 
     // TODO
 
     return out;
 }
 
-std::string generate_decryptor_code(const UserStruct& user_struct, const std::string& encrypt_type) {
-    std::string out;
+std::string CppGenerator::generate_decryptor_code(const UserStruct& user_struct, const std::string& encrypt_type) {
+    std::string out = encrypt_type + "\n";
 
     // TODO
 

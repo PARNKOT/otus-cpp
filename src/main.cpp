@@ -58,3 +58,44 @@ int main(int argc, char* argv[])  {
 
     return 0;
 }
+
+// TEST
+
+#include <type_traits>
+
+using Byte = uint8_t;
+using ByteVector = std::vector<uint8_t>;
+
+
+template<typename T, typename std::enable_if<std::is_integral_v<T>>* = nullptr>
+ByteVector to_bytes(T var) {
+    size_t size = sizeof(T);
+    ByteVector out(size);
+
+    for (size_t i = 0; i < size; ++i) {
+        out[size - i - 1] = (var >> 8 * i) & 0xFF;
+    }
+ 
+    return out;
+}
+
+template<typename T, typename std::enable_if<std::is_same_v<T, double>>* = nullptr>
+ByteVector to_bytes(T var) {
+    union {
+        double from;
+        uint64_t to;
+    } tmp;
+    tmp.from = var;
+    
+    return to_bytes(tmp.to);
+}
+
+template<typename T, typename std::enable_if<std::is_same_v<T, std::string>>* = nullptr>
+ByteVector to_bytes(T var) {
+    ByteVector out;
+    out.reserve(var.size());
+
+    std::copy(var.cbegin(), var.cend(), std::back_inserter(out));
+
+    return out;
+}
