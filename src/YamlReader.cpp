@@ -12,7 +12,7 @@ UserStructArray YamlReader::read(const fs::path& proto_path) {
     }
 
     if (!config["structures"].IsSequence()) {
-        throw std::runtime_error("Keyword \"structures\" type is not a sequence");
+        throw std::runtime_error("Keyword \"structures\" is not a sequence type");
     }
 
     YAML::Node structures = config["structures"];

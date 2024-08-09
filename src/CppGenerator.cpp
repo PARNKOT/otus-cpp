@@ -1,3 +1,4 @@
+#include <fmt/core.h>
 #include "inja/inja.hpp"
 #include "nlohmann/json.hpp"
 #include "CppGenerator.hpp"
@@ -35,7 +36,14 @@ std::string CppGenerator::generate(const UserStruct& user_struct) {
 }
 
 std::string CppGenerator::generate_encryptor_code(const UserStruct& user_struct, const std::string& encrypt_type) {
-    std::string out = encrypt_type + "\n";
+    std::string out;
+    out += "ByteVector bytes;\n";
+
+    for (const auto& field : user_struct.fields()) {
+        out += fmt::format("bytes = to_bytes(user_struct.{0});\n", field.name.c_str());
+        out += "std::copy(bytes.cbegin(), bytes.cend(), std::back_inserter(out));\n";
+    }
+
 
     // TODO
 
@@ -43,7 +51,7 @@ std::string CppGenerator::generate_encryptor_code(const UserStruct& user_struct,
 }
 
 std::string CppGenerator::generate_decryptor_code(const UserStruct& user_struct, const std::string& encrypt_type) {
-    std::string out = encrypt_type + "\n";
+    std::string out;
 
     // TODO
 

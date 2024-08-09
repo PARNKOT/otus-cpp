@@ -22,7 +22,7 @@ add_executable(${PROJECT_NAME}
                src/Field.cpp
                src/CppGenerator.cpp)
 
-target_link_libraries(${PROJECT_NAME} yaml-cpp)
+target_link_libraries(${PROJECT_NAME} yaml-cpp fmt)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD 17
