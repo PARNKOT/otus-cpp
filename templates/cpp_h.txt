@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+#include <vector>
 
 struct {{ struct_name }} {
 {% for field in fields %}
@@ -16,13 +18,13 @@ public:
     encryptor_out_t encrypt(const {{ struct_name }}& user_struct) {
         encryptor_out_t out;
 
-        // ...
+        {{ encryptor_code }}
 
         return out;
     }
 
 private:
-}
+};
 
 
 class {{ struct_name }}_decryptor {
@@ -34,7 +36,7 @@ public:
     {{ struct_name }} decrypt(const decryptor_in_t& msg) {
         {{ struct_name }} user_struct;
 
-        // ...
+        {{ decryptor_code }}
 
         return user_struct;
     }
