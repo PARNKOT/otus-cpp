@@ -40,8 +40,8 @@ std::string CppGenerator::generate_encryptor_code(const UserStruct& user_struct,
     out += "ByteVector bytes;\n";
 
     for (const auto& field : user_struct.fields()) {
-        out += fmt::format("bytes = to_bytes(user_struct.{0});\n", field.name.c_str());
-        out += "std::copy(bytes.cbegin(), bytes.cend(), std::back_inserter(out));\n";
+        out += fmt::format("\t\tbytes = to_bytes(user_struct.{0});\n", field.name.c_str());
+        out += "\t\tstd::copy(bytes.cbegin(), bytes.cend(), std::back_inserter(out));\n";
     }
 
 
@@ -51,7 +51,11 @@ std::string CppGenerator::generate_encryptor_code(const UserStruct& user_struct,
 }
 
 std::string CppGenerator::generate_decryptor_code(const UserStruct& user_struct, const std::string& encrypt_type) {
-    std::string out;
+    std::string out = "size_t offset = 0;\n";
+
+    for (const auto& field : user_struct.fields()) {
+        out += fmt::format("\t\toffset += from_bytes(msg, offset, user_struct.{0});\n", field.name);
+    }
 
     // TODO
 

@@ -40,9 +40,58 @@ ByteVector to_bytes(T var) {
     ByteVector out;
     out.reserve(var.size());
 
+    uint32_t str_length = var.size();
+    out.reserve(sizeof(str_length) + str_length);
+
+    auto str_size_bytes = to_bytes(str_length);
+
+    std::copy(str_size_bytes.cbegin(), str_size_bytes.cend(), std::back_inserter(out));
+
     std::copy(var.cbegin(), var.cend(), std::back_inserter(out));
 
     return out;
+}
+
+template <typename Iterable, typename T, typename std::enable_if_t<std::is_integral_v<T>>* = nullptr>
+size_t from_bytes(const Iterable& container, size_t offset, T& out) {
+    auto var_size = sizeof(T);
+    
+    for (i = 0; i < var_size; ++i) {
+        out |= container[offset + i] << 8 * (var_size - 1 - i);
+    }
+
+    return var_size;
+}
+
+template <typename Iterable, typename T, typename std::enable_if_t<std::is_same_v<T, double>>* = nullptr>
+size_t from_bytes(const Iterable& container, size_t offset, T& out) {
+    auto var_size = sizeof(T);
+    
+    union {
+        uint64_t from;
+        double to;
+    } tmp;
+
+    for (i = 0; i < var_size; ++i) {
+        tmp.from |= container[offset + i] << 8 * (var_size - 1 - i);
+    }
+
+    out = tmp.to;
+
+    return var_size;
+}
+
+template <typename Iterable, typename T, typename std::enable_if_t<std::is_same_v<T, std::string>>* = nullptr>
+size_t from_bytes(const Iterable& container, size_t offset, T& out) {
+    uint32_t str_len = 0;
+    from_bytes(container, offset, str_len);
+
+    offset += sizeof(str_len);
+    for (i = 0; i < str_len; ++i) {
+        out.push_back(container[offset + i]);
+    }
+
+    return sizeof(str_len) + str_len;
 }
 
 class {{ struct_name }}_encryptor {
