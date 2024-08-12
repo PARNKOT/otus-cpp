@@ -19,7 +19,7 @@ structures:
         type: uint16_t
       - name: "uint32_var"
         type: uint32_t
-      - name: "uin64_var"
+      - name: "uint64_var"
         type: uint64_t
       - name: "double_var"
         type: double

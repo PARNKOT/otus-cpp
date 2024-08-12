@@ -32,22 +32,27 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 if(WITH_BOOST_TEST)
     find_package(Boost COMPONENTS unit_test_framework REQUIRED)
     add_executable(test_version tests/test_version.cpp)
+    add_executable(test_generator tests/test_generator.cpp)
 
-    set_target_properties(test_version PROPERTIES
+    set_target_properties(test_version test_generator PROPERTIES
         CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON
     )
 
-    set_target_properties(test_version PROPERTIES
+    set_target_properties(test_version test_generator PROPERTIES
         COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
         INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIR}"
     )
 
     target_include_directories(test_version PRIVATE ${CMAKE_BINARY_DIR})
+    target_include_directories(test_generator PUBLIC ${CMAKE_SOURCE_DIR})
 
     target_link_libraries(test_version
         ${Boost_LIBRARIES}
     )
+
+    target_link_libraries(test_generator ${Boost_LIBRARIES})
+
 endif()
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)

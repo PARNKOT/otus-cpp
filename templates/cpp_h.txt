@@ -3,11 +3,8 @@
 #include <vector>
 #include <type_traits>
 
-struct {{ struct_name }} {
-{% for field in fields %}
-    {{ field.type }} {{ field.name }};    
-{% endfor %}
-};
+#ifndef GENERATOR_UTILS_HPP
+#define GENERATOR_UTILS_HPP
 
 using Byte = uint8_t;
 using ByteVector = std::vector<uint8_t>;
@@ -55,10 +52,17 @@ ByteVector to_bytes(T var) {
 template <typename Iterable, typename T, typename std::enable_if_t<std::is_integral_v<T>>* = nullptr>
 size_t from_bytes(const Iterable& container, size_t offset, T& out) {
     auto var_size = sizeof(T);
-    
-    for (i = 0; i < var_size; ++i) {
-        out |= container[offset + i] << 8 * (var_size - 1 - i);
+
+    union {
+        Byte from[sizeof(T)];
+        T to;
+    } tmp;
+
+    for (int i = 0; i < var_size; ++i) {
+        tmp.from[i] = container[offset + var_size - 1 - i];
     }
+
+    out = tmp.to;
 
     return var_size;
 }
@@ -66,14 +70,14 @@ size_t from_bytes(const Iterable& container, size_t offset, T& out) {
 template <typename Iterable, typename T, typename std::enable_if_t<std::is_same_v<T, double>>* = nullptr>
 size_t from_bytes(const Iterable& container, size_t offset, T& out) {
     auto var_size = sizeof(T);
-    
+
     union {
-        uint64_t from;
         double to;
+        Byte from[sizeof(double)];
     } tmp;
 
-    for (i = 0; i < var_size; ++i) {
-        tmp.from |= container[offset + i] << 8 * (var_size - 1 - i);
+    for (int i = 0; i < var_size; ++i) {
+        tmp.from[i] = container[offset + var_size - 1 - i];
     }
 
     out = tmp.to;
@@ -85,14 +89,24 @@ template <typename Iterable, typename T, typename std::enable_if_t<std::is_same_
 size_t from_bytes(const Iterable& container, size_t offset, T& out) {
     uint32_t str_len = 0;
     from_bytes(container, offset, str_len);
-
+    for (int i = 0; i < var_size; ++i) {
+        out |= container[offset + i] << (8 * (var_size - 1 - i));
+    }
     offset += sizeof(str_len);
-    for (i = 0; i < str_len; ++i) {
+    for (int i = 0; i < str_len; ++i) {
         out.push_back(container[offset + i]);
     }
 
     return sizeof(str_len) + str_len;
 }
+
+#endif
+
+struct {{ struct_name }} {
+{% for field in fields %}
+    {{ field.type }} {{ field.name }};
+{% endfor %}
+};
 
 class {{ struct_name }}_encryptor {
 public:
