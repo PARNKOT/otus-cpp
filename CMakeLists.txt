@@ -12,8 +12,22 @@ option(WITH_BOOST_TEST "Whether to build Boost test" ON)
 
 configure_file(version.hpp.in version.hpp)
 
-find_package(yaml-cpp REQUIRED)
+#find_package(yaml-cpp REQUIRED)
 find_package(Boost COMPONENTS program_options REQUIRED)
+
+include(FetchContent)
+
+FetchContent_Declare(
+  yaml-cpp
+  GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+)
+FetchContent_GetProperties(yaml-cpp)
+
+if(NOT yaml-cpp_POPULATED)
+  message(STATUS "Fetching yaml-cpp...")
+  FetchContent_Populate(yaml-cpp)
+  add_subdirectory(${yaml-cpp_SOURCE_DIR} ${yaml-cpp_BINARY_DIR})
+endif()
 
 include_directories(${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/3rdparty)
 
@@ -23,7 +37,7 @@ add_executable(${PROJECT_NAME}
                src/Field.cpp
                src/CppGenerator.cpp)
 
-target_link_libraries(${PROJECT_NAME} yaml-cpp fmt ${Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} yaml-cpp::yaml-cpp fmt ${Boost_LIBRARIES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD 17
