@@ -89,9 +89,7 @@ template <typename Iterable, typename T, typename std::enable_if_t<std::is_same_
 size_t from_bytes(const Iterable& container, size_t offset, T& out) {
     uint32_t str_len = 0;
     from_bytes(container, offset, str_len);
-    for (int i = 0; i < var_size; ++i) {
-        out |= container[offset + i] << (8 * (var_size - 1 - i));
-    }
+
     offset += sizeof(str_len);
     for (int i = 0; i < str_len; ++i) {
         out.push_back(container[offset + i]);

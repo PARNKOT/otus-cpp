@@ -13,6 +13,7 @@ option(WITH_BOOST_TEST "Whether to build Boost test" ON)
 configure_file(version.hpp.in version.hpp)
 
 find_package(yaml-cpp REQUIRED)
+find_package(Boost COMPONENTS program_options REQUIRED)
 
 include_directories(${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/3rdparty)
 
@@ -22,7 +23,7 @@ add_executable(${PROJECT_NAME}
                src/Field.cpp
                src/CppGenerator.cpp)
 
-target_link_libraries(${PROJECT_NAME} yaml-cpp fmt)
+target_link_libraries(${PROJECT_NAME} yaml-cpp fmt ${Boost_LIBRARIES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD 17
