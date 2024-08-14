@@ -20,7 +20,7 @@ jobs:
       - run: cmake -S tests -B tests/build
       - run: cmake --build tests/build
       - run: ./tests/build/test_generator
-      - run: cmake --build . --target package
+      - run: cmake --build build --target package
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
