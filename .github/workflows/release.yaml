@@ -14,8 +14,8 @@ jobs:
         with:
           submodules: true
       - run: sudo apt-get update && sudo apt-get install libboost-test-dev libboost-program-options1.71-dev libfmt-dev -y
-      - run: cmake .
-      - run: cmake --build .
+      - run: cmake -B build
+      - run: cmake --build build
       - run: ./build/application -p proto/test.yaml -l cpp -s ./generated
       - run: cmake -S tests -B tests/build
       - run: cmake --build tests/build
